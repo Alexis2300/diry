@@ -598,9 +598,9 @@
             <div class="panel-header"><div><h3>Нужно проверить</h3><p>Имена, числа и термины</p></div></div>
             <div class="review-progress"><div class="review-progress-row"><span>Готовность</span><span id="review-percent-label">33%</span></div><div class="progress-track"><div class="progress-value" id="review-progress-value"></div></div></div>
             <div class="review-list">
-              <div class="review-item" data-review-id="number"><p class="review-type">Число</p><strong>Срок первого результата</strong><input class="review-input" type="text" value="7 дней" data-review-input="number" aria-label="Проверяемое число"><p>Возможно, спикер сказал «семь рабочих дней».</p><button class="button secondary small" type="button" data-confirm-review="number">Подтвердить</button></div>
-              <div class="review-item" data-review-id="term"><p class="review-type">Термин</p><strong>Название продукта</strong><input class="review-input" type="text" value="ClientFlow" data-review-input="term" aria-label="Проверяемый термин"><p>Проверьте написание названия продукта.</p><button class="button secondary small" type="button" data-confirm-review="term">Подтвердить</button></div>
-              <div class="review-item confirmed" data-review-id="speaker"><p class="review-type">Имя</p><strong>Спикер вебинара</strong><input class="review-input" type="text" value="Анна Белова" data-review-input="speaker" aria-label="Проверяемое имя"><p>Имя и фамилия спикера подтверждены.</p><button class="button secondary small" type="button" data-confirm-review="speaker" disabled>Подтверждено ✓</button></div>
+              <div class="review-item" data-review-id="number"><p class="review-type">Число</p><strong>Срок первого результата</strong><input class="review-input" type="text" value="7 дней" data-review-input="number" aria-label="Проверяемое число"><p data-review-hint="number">Возможно, спикер сказал «семь рабочих дней».</p><button class="button secondary small" type="button" data-confirm-review="number">Подтвердить</button></div>
+              <div class="review-item" data-review-id="term"><p class="review-type">Термин</p><strong>Название продукта</strong><input class="review-input" type="text" value="ClientFlow" data-review-input="term" aria-label="Проверяемый термин"><p data-review-hint="term">Проверьте написание названия продукта.</p><button class="button secondary small" type="button" data-confirm-review="term">Подтвердить</button></div>
+              <div class="review-item confirmed" data-review-id="speaker"><p class="review-type">Имя</p><strong>Спикер вебинара</strong><input class="review-input" type="text" value="Анна Белова" data-review-input="speaker" aria-label="Проверяемое имя"><p data-review-hint="speaker">Имя и фамилия спикера подтверждены.</p><button class="button secondary small" type="button" data-confirm-review="speaker" disabled>Подтверждено ✓</button></div>
             </div>
           </aside>
         </div>
@@ -861,14 +861,23 @@
       return updateReviewStatus();
     }
 
+    function reviewHintText(item) {
+      if (item.id === 'speaker') return item.confirmed ? 'Имя и фамилия спикера подтверждены.' : 'Подтвердите имя и фамилию спикера.';
+      if (item.id === 'number') return item.confirmed ? 'Число подтверждено.' : 'Возможно, спикер сказал «семь рабочих дней».';
+      if (item.id === 'term') return item.confirmed ? 'Название продукта подтверждено.' : 'Проверьте написание названия продукта.';
+      return item.confirmed ? 'Фрагмент подтверждён.' : 'Проверьте этот фрагмент.';
+    }
+
     function renderReviewItems() {
       appState.reviewItems.forEach((item) => {
         const row = document.querySelector(`[data-review-id="${item.id}"]`);
         const input = document.querySelector(`[data-review-input="${item.id}"]`);
         const button = document.querySelector(`[data-confirm-review="${item.id}"]`);
+        const hint = document.querySelector(`[data-review-hint="${item.id}"]`);
         document.querySelectorAll(`[data-review-value="${item.id}"]`).forEach((value) => { value.textContent = item.value; });
         if (row) row.classList.toggle('confirmed', item.confirmed);
         if (input && input.value !== item.value) input.value = item.value;
+        if (hint) hint.textContent = reviewHintText(item);
         if (button) {
           button.disabled = item.confirmed;
           button.textContent = item.confirmed ? 'Подтверждено ✓' : 'Подтвердить';
